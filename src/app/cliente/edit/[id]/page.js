@@ -18,7 +18,7 @@ const EditCliente = ({ params }) => {
 
     const onFinish = (values) => {
         console.log(values);
-        axiosInstance.put(`/clientes/${id}`, values)
+        axiosInstance.put(`api/clientes/${id}`, values)
             .then(() => {
                 message.success('Cliente actualizado con éxito');
                 router.push('/cliente');

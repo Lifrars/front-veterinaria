@@ -1,44 +1,57 @@
 'use client';
-import React from 'react';
-import { Form, Input, Button, message } from 'antd';
+import React, {useEffect, useState} from 'react';
+import {Form, Input, Button, message, Select} from 'antd';
 import { useRouter } from 'next/navigation';
 import axiosInstance from "@/utils/axios";
 
-const CreateMascota = () => {
+const CreateMedicamento = () => {
     const [form] = Form.useForm();
     const router = useRouter();
-
+    const [mascotas,setMascotas] = useState([]);
+    const { Option } = Select;
     const onFinish = (values) => {
-        console.log(values)
-        axiosInstance.post('api/mascotas', values)
+        axiosInstance.post('api/medicamentos', values)
             .then(() => {
-                message.success('Cliente creado con éxito');
-                router.push('/cliente');
+                message.success('Medicamento creado con éxito');
+                router.push('/medicamento');
             })
-            .catch(error => message.error('Error al crear cliente'));
+            .catch(error => message.error('Error al crear medicamento'));
     };
+    useEffect(() => {
+        axiosInstance.get(`api/mascotas`)
+            .then(response => setMascotas(response.data))
+            .catch(error => console.error('Error fetching medication:', error));
+    }, []);
 
     return (
         <div>
-            <h1>Crear Mascota</h1>
+            <h1>Crear Medicamento</h1>
             <Form form={form} onFinish={onFinish}>
-                <Form.Item label="Identificación" name="identificacion" rules={[{ required: true, message: 'Por favor ingrese la identificación' }]}>
-                    <Input />
-                </Form.Item>
                 <Form.Item label="Nombre" name="nombre" rules={[{ required: true, message: 'Por favor ingrese el nombre' }]}>
                     <Input />
                 </Form.Item>
-                <Form.Item label="Raza" name="raza" rules={[{ required: true, message: 'Por favor ingrese la raza' }]}>
+                <Form.Item label="Descripción" name="descripcion">
                     <Input />
                 </Form.Item>
-                <Form.Item label="Edad" name="edad" rules={[{ required: true, message: 'Por favor ingrese la edad' }]}>
-                    <Input type="number" />
-                </Form.Item>
-                <Form.Item label="Peso" name="peso" rules={[{ required: true, message: 'Por favor ingrese el peso' }]}>
-                    <Input type="number" step="0.1" />
-                </Form.Item>
-                <Form.Item label="Cédula del Cliente" name="clienteCedula" rules={[{ required: true, message: 'Por favor ingrese la cédula del cliente' }]}>
+                <Form.Item label="Dosis" name="dosis">
                     <Input />
+                </Form.Item>
+                <Form.Item
+                    label="Identificacion perro"
+                    name="mascotaIdentificacion"
+                    rules={[{ required: true, message: 'Por favor seleccione el perro' }]}
+                >
+                    <Select
+                        showSearch
+                        placeholder="Seleccione un perro"
+                        optionFilterProp="children"
+                    >
+                        {mascotas.map(mascota => (
+                            <Option key={mascota.identificacion} value={mascota.identificacion}>
+                                {mascota.nombre}
+                            </Option>
+                        ))}
+                    </Select>
                 </Form.Item>
                 <Form.Item>
                     <Button type="primary" htmlType="submit">Crear</Button>
@@ -48,5 +61,4 @@ const CreateMascota = () => {
     );
 };
 
-export default CreateMascota;
-
+export default CreateMedicamento;

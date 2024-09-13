@@ -1,0 +1,223 @@
+- Eliminar las tablas si ya existen
+DROP TABLE log_permisos;
+DROP TABLE log_perfiles;
+DROP TABLE elecciones;
+DROP TABLE quejas;
+DROP TABLE reservas;
+DROP TABLE usuarios;
+DROP TABLE permisos;
+DROP TABLE opciones;
+DROP TABLE modulosvistas;
+DROP TABLE votaciones;
+DROP TABLE perfiles;
+DROP TABLE modulos;
+DROP TABLE areas_comunes;
+DROP TABLE estados;
+
+-- Tabla: Estados
+CREATE TABLE estados (
+    id_est NUMBER(10),
+    nombre_est VARCHAR2(50),
+    descripcion_est VARCHAR2(500),
+    CONSTRAINT pk_estados PRIMARY KEY (id_est),
+    CONSTRAINT uq_nombre_estado UNIQUE (nombre_est),
+    CONSTRAINT nn_nombre_estado CHECK (nombre_est IS NOT NULL),
+    CONSTRAINT nn_descripcion_est CHECK (descripcion_est IS NOT NULL)
+);
+
+-- Tabla: Areas_Comunes
+CREATE TABLE areas_comunes (
+    id_area NUMBER(10),
+    nombre_area VARCHAR2(50),
+    descripcion_area VARCHAR2(500),
+    capacidad_area NUMBER(4),
+    horario_area VARCHAR2(50),
+    ubicacion_area VARCHAR2(50),
+    estado_area NUMBER(10) DEFAULT 0,
+    CONSTRAINT pk_areas_comunes PRIMARY KEY (id_area),
+    CONSTRAINT nn_nombre_area CHECK (nombre_area IS NOT NULL),
+    CONSTRAINT nn_descripcion_area CHECK (descripcion_area IS NOT NULL),
+    CONSTRAINT nn_horario_area CHECK (horario_area IS NOT NULL),
+    CONSTRAINT nn_ubicacion_area CHECK (ubicacion_area IS NOT NULL)
+);
+
+-- Tabla: Modulos
+CREATE TABLE modulos (
+    id_mod NUMBER(10),
+    nombre_modulo VARCHAR2(50),
+    CONSTRAINT pk_modulos PRIMARY KEY (id_mod),
+    CONSTRAINT nn_modulo CHECK (nombre_modulo IS NOT NULL)
+);
+
+-- Tabla: Perfiles
+CREATE TABLE perfiles (
+    id_perfil NUMBER(10),
+    nombre_perfil VARCHAR2(50),
+    descripcion_perfil VARCHAR2(500),
+    status_perfil NUMBER(1),
+    CONSTRAINT pk_perfiles PRIMARY KEY (id_perfil),
+    CONSTRAINT nn_descripcion_perfil CHECK (descripcion_perfil IS NOT NULL),
+    CONSTRAINT nn_status_perfil CHECK (status_perfil IS NOT NULL),
+    CONSTRAINT nn_nombre_perfil CHECK (nombre_perfil IS NOT NULL)
+);
+
+-- Tabla: Votaciones
+CREATE TABLE votaciones (
+    id_votacion NUMBER(10),
+    titulo_votacion VARCHAR2(50),
+    descripcion_votacion VARCHAR2(500),
+    estado_votacion NUMBER(10),
+    CONSTRAINT pk_votaciones PRIMARY KEY (id_votacion),
+    CONSTRAINT nn_titulo_votacion CHECK (titulo_votacion IS NOT NULL),
+    CONSTRAINT nn_descripcion_votacion CHECK (descripcion_votacion IS NOT NULL),
+    CONSTRAINT nn_estado_votacion CHECK (estado_votacion IS NOT NULL)
+);
+
+-- Tabla: Modulosvistas
+CREATE TABLE modulosvistas (
+    id_modvista NUMBER(10),
+    id_mod NUMBER(10),
+    nombre_vista VARCHAR2(50),
+    file_vista VARCHAR2(500),
+    CONSTRAINT pk_modulosvistas PRIMARY KEY (id_modvista),
+    CONSTRAINT fk_modulosvistas_modulos FOREIGN KEY (id_mod) REFERENCES modulos (id_mod),
+    CONSTRAINT nn_nombre_vista CHECK (nombre_vista IS NOT NULL),
+    CONSTRAINT nn_file_vista CHECK (file_vista IS NOT NULL)
+);
+
+-- Tabla: Opciones
+CREATE TABLE opciones (
+    id_opcion NUMBER(10),
+    id_votacion NUMBER(10),
+    descripcion_opcion VARCHAR2(500),
+    CONSTRAINT pk_opciones PRIMARY KEY (id_opcion),
+    CONSTRAINT fk_opciones_votaciones FOREIGN KEY (id_votacion) REFERENCES votaciones (id_votacion),
+    CONSTRAINT nn_descripcion_opcion CHECK (descripcion_opcion IS NOT NULL)
+);
+
+-- Tabla: Permisos
+CREATE TABLE permisos (
+    id_permiso NUMBER(10),
+    id_perfil NUMBER(10),
+    id_mod NUMBER(10),
+    id_vista NUMBER(10),
+    elemento_permiso VARCHAR2(50),
+    permiso VARCHAR2(50),
+    tipo_elemento VARCHAR2(50),
+    CONSTRAINT pk_permisos PRIMARY KEY (id_permiso),
+    CONSTRAINT fk_permisos_perfiles FOREIGN KEY (id_perfil) REFERENCES perfiles (id_perfil),
+    CONSTRAINT fk_permisos_modulosvistas FOREIGN KEY (id_vista) REFERENCES modulosvistas (id_modvista),
+    CONSTRAINT nn_elemento_permiso CHECK (elemento_permiso IS NOT NULL),
+    CONSTRAINT nn_permiso CHECK (permiso IS NOT NULL),
+    CONSTRAINT nn_tipo_elemento CHECK (tipo_elemento IS NOT NULL)
+);
+
+-- Tabla: Usuarios
+CREATE TABLE usuarios (
+    id_usuario NUMBER(10),
+    documento_usuario NUMBER(15),
+    nombre_completo_usuario VARCHAR2(50),
+    telefono_usuario VARCHAR2(15),
+    correo_usuario VARCHAR2(50),
+    contrasena_usuario VARCHAR2(50),
+    estado_usuario VARCHAR2(50),
+    ultima_sesion DATE,
+    session_activa VARCHAR2(50),
+    id_perfil NUMBER(10),
+    codigo_temporal NUMBER(6),
+    CONSTRAINT pk_usuarios PRIMARY KEY (id_usuario),
+    CONSTRAINT fk_usuarios_perfiles FOREIGN KEY (id_perfil) REFERENCES perfiles (id_perfil),
+    CONSTRAINT nn_documento_usuario CHECK (documento_usuario IS NOT NULL),
+    CONSTRAINT nn_nombre_completo_usuario CHECK (nombre_completo_usuario IS NOT NULL),
+    CONSTRAINT nn_telefono_usuario CHECK (telefono_usuario IS NOT NULL),
+    CONSTRAINT nn_correo_usuario CHECK (correo_usuario IS NOT NULL),
+    CONSTRAINT nn_contrasena_usuario CHECK (contrasena_usuario IS NOT NULL),
+    CONSTRAINT nn_estado_usuario CHECK (estado_usuario IS NOT NULL),
+    CONSTRAINT nn_session_activa CHECK (session_activa IS NOT NULL)
+);
+
+-- Tabla: Elecciones
+CREATE TABLE elecciones (
+    id_eleccion NUMBER(10),
+    id_usuario NUMBER(10),
+    id_opcion NUMBER(10),
+    CONSTRAINT pk_elecciones PRIMARY KEY (id_eleccion),
+    CONSTRAINT fk_elecciones_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    CONSTRAINT fk_elecciones_opciones FOREIGN KEY (id_opcion) REFERENCES opciones (id_opcion),
+    CONSTRAINT nn_id_usuario CHECK (id_usuario IS NOT NULL),
+    CONSTRAINT nn_id_opcion CHECK (id_opcion IS NOT NULL)
+);
+
+-- Tabla: Log_Perfiles
+CREATE TABLE log_perfiles (
+    id_log_perfil NUMBER(10),
+    id_perfil NUMBER(10),
+    nombre_perfil VARCHAR2(50),
+    cambio_perfil VARCHAR2(50),
+    evento_log VARCHAR2(50),
+    id_usuario NUMBER(10),
+    fecha_log DATE DEFAULT CURRENT_DATE,
+    CONSTRAINT pk_log_perfiles PRIMARY KEY (id_log_perfil),
+    CONSTRAINT fk_log_perfiles_perfiles FOREIGN KEY (id_perfil) REFERENCES perfiles (id_perfil),
+    CONSTRAINT fk_log_perfiles_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    CONSTRAINT nn_nombre_perfil_log CHECK (nombre_perfil IS NOT NULL),
+    CONSTRAINT nn_evento_log CHECK (evento_log IS NOT NULL),
+    CONSTRAINT nn_cambio_perfil CHECK (cambio_perfil IS NOT NULL)
+);
+
+-- Tabla: Log_Permisos
+CREATE TABLE log_permisos (
+    id_log_permiso NUMBER(10),
+    id_permiso NUMBER(10),
+    id_perfil NUMBER(10),
+    id_mod NUMBER(10),
+    id_vista NUMBER(10),
+    elemento_log_permiso VARCHAR2(50),
+    permiso_log VARCHAR2(50),
+    tipo_elemento_log VARCHAR2(50),
+    evento_log_permiso VARCHAR2(50),
+    id_usuario NUMBER(10),
+    fecha_log DATE DEFAULT CURRENT_DATE,
+    CONSTRAINT pk_log_permisos PRIMARY KEY (id_log_permiso),
+    CONSTRAINT fk_log_permisos_permisos FOREIGN KEY (id_permiso) REFERENCES permisos (id_permiso),
+    CONSTRAINT fk_log_permisos_perfiles FOREIGN KEY (id_perfil) REFERENCES perfiles (id_perfil),
+    CONSTRAINT fk_log_permisos_modulos FOREIGN KEY (id_mod) REFERENCES modulos (id_mod),
+    CONSTRAINT fk_log_permisos_modulosvistas FOREIGN KEY (id_vista) REFERENCES modulosvistas (id_modvista),
+    CONSTRAINT fk_log_permisos_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    CONSTRAINT nn_elemento_log_permiso CHECK (elemento_log_permiso IS NOT NULL),
+    CONSTRAINT nn_permiso_log CHECK (permiso_log IS NOT NULL),
+    CONSTRAINT nn_tipo_elemento_log CHECK (tipo_elemento_log IS NOT NULL),
+    CONSTRAINT nn_evento_log_permiso CHECK (evento_log_permiso IS NOT NULL)
+);
+
+-- Tabla: Quejas
+CREATE TABLE quejas (
+    id_queja NUMBER(10),
+    id_usuario NUMBER(10),
+    descripcion_queja VARCHAR2(500),
+    fecha_creacion DATE,
+    estado_queja VARCHAR2(50),
+    CONSTRAINT pk_quejas PRIMARY KEY (id_queja),
+    CONSTRAINT fk_quejas_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    CONSTRAINT nn_descripcion_queja CHECK (descripcion_queja IS NOT NULL),
+    CONSTRAINT nn_estado_queja CHECK (estado_queja IS NOT NULL)
+);
+
+-- Tabla: Reservas
+CREATE TABLE reservas (
+    id_reserva NUMBER(10),
+    id_usuario NUMBER(10),
+    id_area NUMBER(10),
+    fecha_reserva DATE,
+    hora_inicio DATE,
+    hora_fin DATE,
+    comentario_reserva VARCHAR2(500),
+    id_estado NUMBER(10),
+    CONSTRAINT pk_reservas PRIMARY KEY (id_reserva),
+    CONSTRAINT fk_reservas_usuarios FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario),
+    CONSTRAINT fk_reservas_areas_comunes FOREIGN KEY (id_area) REFERENCES areas_comunes (id_area),
+    CONSTRAINT fk_reservas_estados FOREIGN KEY (id_estado) REFERENCES estados (id_est) ON DELETE SET NULL,
+    CONSTRAINT nn_fecha_reserva CHECK (fecha_reserva IS NOT NULL),
+    CONSTRAINT nn_hora_inicio CHECK (hora_inicio IS NOT NULL),
+    CONSTRAINT nn_hora_fin CHECK (hora_fin IS NOT NULL)
+);

@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import { Form, Input, Button, message } from 'antd';
+import {Form, Input, Button, message, Select} from 'antd';
 import { useRouter } from 'next/navigation';
 import axiosInstance from "@/utils/axios";
 
@@ -9,7 +9,13 @@ const EditMascota = ({ params }) => {
     const router = useRouter();
     const { id } = params;
     const [mascota, setMascota] = useState(null);
-
+    const { Option } = Select;
+    const [clientes, setClientes] =useState([]);
+    useEffect(() => {
+        axiosInstance.get('api/clientes')
+            .then(response => setClientes(response.data))
+            .catch(error => console.error('Error fetching clients:', error));
+    }, []);
     useEffect(() => {
         axiosInstance.get(`api/mascotas/${id}`)
             .then(response => setMascota(response.data))
@@ -45,8 +51,22 @@ const EditMascota = ({ params }) => {
                     <Form.Item label="Peso" name="peso" rules={[{ required: true, message: 'Por favor ingrese el peso' }]}>
                         <Input type="number" step="0.1" />
                     </Form.Item>
-                    <Form.Item label="Cédula del Cliente" name="clienteCedula" rules={[{ required: true, message: 'Por favor ingrese la cédula del cliente' }]}>
-                        <Input />
+                    <Form.Item
+                        label="Cédula del Cliente"
+                        name="clienteCedula"
+                        rules={[{ required: true, message: 'Por favor seleccione la cédula del cliente' }]}
+                    >
+                        <Select
+                            showSearch
+                            placeholder="Seleccione un cliente"
+                            optionFilterProp="children" // Busca en el contenido de las opciones
+                        >
+                            {clientes.map(cliente => (
+                                <Option key={cliente.cedula} value={cliente.cedula}>
+                                    {cliente.nombres} {cliente.apellidos} - {cliente.cedula}
+                                </Option>
+                            ))}
+                        </Select>
                     </Form.Item>
                     <Form.Item>
                         <Button type="primary" htmlType="submit">Actualizar</Button>

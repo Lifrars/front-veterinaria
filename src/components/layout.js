@@ -7,18 +7,30 @@ const { Header, Content, Sider } = Layout;
 
 const AppLayout = ({ children }) => {
     return (
-        te">
+        <Layout style={{ minHeight: '100vh' }}>
+            <Sider collapsible>
+                <div style={{ height: 32, margin: 16, color: 'white', textAlign: 'center' }}>
+                    PETS S.A.
+                </div>
+                <Menu theme="dark" mode="inline" defaultSelectedKeys={['1']}>
+                    <Menu.Item key={1}>
+                        <Link href="/cliente">
                             Clientes
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="2">
+                    <Menu.Item key={2}>
                         <Link href="/mascota">
                             Mascotas
                         </Link>
                     </Menu.Item>
-                    <Menu.Item key="3">
+                    <Menu.Item key={3}>
                         <Link href="/medicamento">
                             Medicamentos
+                        </Link>
+                    </Menu.Item>
+                    <Menu.Item key={4}>
+                        <Link href="/reporte">
+                            Reporte
                         </Link>
                     </Menu.Item>
                 </Menu>

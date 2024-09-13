@@ -3,14 +3,16 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #ffffff; /* Fondo blanco */
+  --foreground: #ededed; /* Texto oscuro */
+  --primary: #007bff; /* Azul primario */
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #ededed; /* Fondo oscuro */
+    --foreground: #ededed; /* Texto claro */
+    --primary: #1e90ff; /* Azul claro en modo oscuro */
   }
 }
 
@@ -18,6 +20,21 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  line-height: 1.6; /* Mejora la legibilidad */
+  margin: 0; /* Elimina el margen por defecto */
+  padding: 0; /* Elimina el padding por defecto */
+}
+
+@layer components {
+  /* Estilo de botón con colores blanco y azul */
+  .btn {
+    @apply px-4 py-2 font-semibold text-white bg-blue-500 rounded-md shadow-md hover:bg-blue-600;
+  }
+
+  /* Estilo de tarjeta con borde azul */
+  .card {
+    @apply bg-white border border-blue-200 rounded-lg shadow-md p-4;
+  }
 }
 
 @layer utilities {

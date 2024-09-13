@@ -1,15 +1,16 @@
 'use client';
-import React, { useState } from 'react';
+import React from 'react';
 import { Form, Input, Button, message } from 'antd';
-import { useRouter } from 'next/router';
-import axiosInstance from "@/utils/axios";
+import axiosInstance from "@/utils/axios";// Ajusta la ruta según tu estructura de carpetas
+import { useRouter } from 'next/navigation';
 
 const CreateCliente = () => {
     const [form] = Form.useForm();
     const router = useRouter();
 
     const onFinish = (values) => {
-        axiosInstance.post('/api/clientes', values)
+        console.log(values)
+        axiosInstance.post('api/clientes', values)
             .then(() => {
                 message.success('Cliente creado con éxito');
                 router.push('/cliente');
@@ -45,3 +46,4 @@ const CreateCliente = () => {
 };
 
 export default CreateCliente;
+
